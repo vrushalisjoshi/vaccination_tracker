@@ -84,7 +84,7 @@ const getVaccinationUpdates = () => {
     .then((json) => {
       if (json.centers) {
         json.centers.forEach((centre) => {
-          if (centre.sessions && centre.sessions[0].available_capacity >= 0) {
+          if (centre.sessions && centre.sessions[0].available_capacity > 0) {
             let message = `Vaccination available for age group ( ${centre.sessions[0].min_age_limit}+ )
             \n on Date: ${centre.sessions[0].date}
             \n Center Name: ${centre.name}
