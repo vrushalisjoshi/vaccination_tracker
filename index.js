@@ -16,9 +16,7 @@ const bot = new TelegramBot(process.env.TOKEN, {
 console.log(nextDate());
 console.log(process.env.COWIN_URL);
 
-let url = `${
-  process.env.COWIN_URL
-}appointment/sessions/public/calendarByDistrict?district_id=397&date=`;
+let url = `${process.env.COWIN_URL}appointment/sessions/public/calendarByDistrict?district_id=397&date=`;
 
 app.get("/", (req, resp) => {
   fetchUrl = url + nextDate();
@@ -66,7 +64,7 @@ app.listen(PORT, () => {
 
 cron.schedule("*/30 * * * * *", () => {
   console.log("running a task every 30 seconds!");
-  console.log((new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })));
+  console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   getVaccinationUpdates();
 });
 
@@ -89,6 +87,12 @@ const getVaccinationUpdates = () => {
     .then((json) => {
       if (json.centers) {
         json.centers.forEach((centre) => {
+          console.log("--------------------------");
+          if (centre.sessions) {
+            console.log(
+              `Center: ${centre.name}, Availability: ${centre.sessions[0].available_capacity}`
+            );
+          }
           if (centre.sessions && centre.sessions[0].available_capacity > 0) {
             let message = `Vaccination available for age group ( ${centre.sessions[0].min_age_limit}+ )
             \n on Date: ${centre.sessions[0].date}
