@@ -66,7 +66,7 @@ app.listen(PORT, () => {
 
 cron.schedule("*/30 * * * * *", () => {
   console.log("running a task every 30 seconds!");
-  console.log((new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  console.log((new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })));
   getVaccinationUpdates();
 });
 
