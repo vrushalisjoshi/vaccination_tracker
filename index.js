@@ -21,9 +21,9 @@ let url = `${
 }appointment/sessions/public/calendarByDistrict?district_id=397&date=`;
 
 app.get("/", (req, resp) => {
-  url = url + nextDate();
-  console.log(url);
-  fetch(url, {
+  fetchUrl = url + nextDate();
+  console.log(fetchUrl);
+  fetch(fetchUrl, {
     method: "GET",
     mode: "cors",
     headers: {
@@ -70,9 +70,9 @@ cron.schedule("*/30 * * * * *", () => {
 });
 
 const getVaccinationUpdates = () => {
-  url = url + nextDate();
-  console.log(url);
-  fetch(url, {
+  fetchUrl = url + nextDate();
+  console.log(fetchUrl);
+  fetch(fetchUrl, {
     method: "GET",
     mode: "cors",
     headers: {
