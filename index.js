@@ -16,11 +16,13 @@ const bot = new TelegramBot(process.env.TOKEN, {
 console.log(nextDate());
 console.log(process.env.COWIN_URL);
 
-const url = `${
+let url = `${
   process.env.COWIN_URL
-}appointment/sessions/public/calendarByDistrict?district_id=397&date=${nextDate()}`;
+}appointment/sessions/public/calendarByDistrict?district_id=397&date=`;
 
 app.get("/", (req, resp) => {
+  url = url + nextDate();
+  console.log(url);
   fetch(url, {
     method: "GET",
     mode: "cors",
@@ -62,12 +64,14 @@ app.listen(PORT, () => {
   console.log(`server started on PORT ${PORT}`);
 });
 
-cron.schedule("*/2 * * * *", () => {
-  console.log("running a task every two minutes");
+cron.schedule("*/30 * * * * *", () => {
+  console.log("running a task every 30 seconds!");
   getVaccinationUpdates();
 });
 
 const getVaccinationUpdates = () => {
+  url = url + nextDate();
+  console.log(url);
   fetch(url, {
     method: "GET",
     mode: "cors",
