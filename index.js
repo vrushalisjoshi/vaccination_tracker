@@ -36,7 +36,7 @@ app.get("/", (req, resp) => {
       return res.ok ? res.json() : res.text();
     })
     .then((json) => {
-      // resp.send(json);
+      resp.send(json);
       if (json.centers) {
         json.centers.forEach((centre) => {
           if (centre.sessions && centre.sessions[0].available_capacity > 0) {
@@ -63,11 +63,11 @@ app.listen(PORT, () => {
   console.log(`server started on PORT ${PORT}`);
 });
 
-cron.schedule("*/5 * * * *", () => {
-  console.log("running a task every 5 minutes!");
-  console.log((new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })));
-  getVaccinationUpdates();
-});
+// cron.schedule("*/5 * * * *", () => {
+//   console.log("running a task every 5 minutes!");
+//   console.log((new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })));
+//   getVaccinationUpdates();
+// });
 
 const getVaccinationUpdates = () => {
   fetchUrl = url + nextDate();
