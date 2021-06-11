@@ -1,6 +1,7 @@
 const express = require("express");
 const fetch = require("node-fetch");
 const TelegramBot = require("node-telegram-bot-api");
+const wakeDyno = require("woke-dyno");
 var cron = require("node-cron");
 const nextDate = require("./utils/GetNextDate");
 require("dotenv").config({ path: __dirname + "/.env" });
@@ -8,7 +9,7 @@ require("dotenv").config({ path: __dirname + "/.env" });
 const app = express();
 
 const PORT = process.env.PORT || 5000;
-
+const DYNO_URL = 'https://fathomless-atoll-16900.herokuapp.com/';
 const bot = new TelegramBot(process.env.TOKEN, {
   polling: true,
 });
@@ -61,6 +62,7 @@ app.get("/", (req, resp) => {
 
 app.listen(PORT, () => {
   console.log(`server started on PORT ${PORT}`);
+  wakeDyno(DYNO_URL).start();
 });
 
 cron.schedule("*/5 * * * *", () => {
