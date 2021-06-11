@@ -14,7 +14,6 @@ const bot = new TelegramBot(process.env.TOKEN, {
 });
 
 console.log(nextDate());
-console.log(process.env.COWIN_URL);
 
 let url = `${
   process.env.COWIN_URL
@@ -37,7 +36,7 @@ app.get("/", (req, resp) => {
       return res.ok ? res.json() : res.text();
     })
     .then((json) => {
-      resp.send(json);
+      // resp.send(json);
       if (json.centers) {
         json.centers.forEach((centre) => {
           if (centre.sessions && centre.sessions[0].available_capacity > 0) {
@@ -87,13 +86,8 @@ const getVaccinationUpdates = () => {
       return res.ok ? res.json() : res.text();
     })
     .then((json) => {
-      console.log(json);
       if (json.centers) {
         json.centers.forEach((centre) => {
-          console.log("--------------------------");
-          if (centre.sessions) {
-            console.log(`Center: ${centre.name}, Availability: ${centre.sessions[0].available_capacity}`);
-          }
           if (centre.sessions && centre.sessions[0].available_capacity > 0) {
             let message = `Vaccination available for age group ( ${centre.sessions[0].min_age_limit}+ )
             \n on Date: ${centre.sessions[0].date}
