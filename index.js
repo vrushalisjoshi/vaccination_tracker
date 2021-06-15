@@ -17,47 +17,7 @@ console.log(nextDate());
 
 let url = `${
   process.env.COWIN_URL
-}appointment/sessions/public/calendarByDistrict?district_id=397&date=`;
-
-app.get("/", (req, resp) => {
-  fetchUrl = url + nextDate();
-  console.log(fetchUrl);
-  fetch(fetchUrl, {
-    method: "GET",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept-Language": "hi_IN",
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
-    },
-  })
-    .then((res) => {
-      return res.ok ? res.json() : res.text();
-    })
-    .then((json) => {
-      resp.send(json);
-      if (json.centers) {
-        json.centers.forEach((centre) => {
-          if (centre.sessions && centre.sessions[0].available_capacity > 0) {
-            let message = `Vaccination available for age group ( ${centre.sessions[0].min_age_limit}+ )
-            \n on Date: ${centre.sessions[0].date}
-            \n Center Name: ${centre.name}
-            \n PINCODE: ${centre.pincode}
-            \n Vaccine: ${centre.sessions[0].vaccine}
-            \n Slots: ${centre.sessions[0].slots}
-            \n Availability count: ${centre.sessions[0].available_capacity}`;
-            bot.sendMessage(process.env.telegram_chat_id, message);
-          }
-        });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500);
-      res.send(err);
-    });
-});
+}appointment/sessions/public/calendarByDistrict?district_id=${process.env.ABD_ID}&date=`;
 
 app.listen(PORT, () => {
   console.log(`server started on PORT ${PORT}`);
@@ -66,44 +26,56 @@ app.listen(PORT, () => {
 cron.schedule("*/5 * * * *", () => {
   console.log("running a task every 5 minutes!");
   console.log((new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })));
-  getVaccinationUpdates();
+  getVaccinationUpdates()();
 });
 
 const getVaccinationUpdates = () => {
-  fetchUrl = url + nextDate();
-  console.log(fetchUrl);
-  fetch(fetchUrl, {
-    method: "GET",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept-Language": "hi_IN",
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
-    },
-  })
-    .then((res) => {
-      return res.ok ? res.json() : res.text();
+  return (request, response) => {
+    fetchUrl = url + nextDate();
+    console.log(fetchUrl);
+    fetch(fetchUrl, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept-Language": "hi_IN",
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
+      },
     })
-    .then((json) => {
-      if (json.centers) {
-        json.centers.forEach((centre) => {
-          if (centre.sessions && centre.sessions[0].available_capacity > 0) {
-            let message = `Vaccination available for age group ( ${centre.sessions[0].min_age_limit}+ )
-            \n on Date: ${centre.sessions[0].date}
-            \n Center Name: ${centre.name}
-            \n PINCODE: ${centre.pincode}
-            \n Vaccine: ${centre.sessions[0].vaccine}
-            \n Slots: ${centre.sessions[0].slots}
-            \n Availability count: ${centre.sessions[0].available_capacity}`;
-            bot.sendMessage(process.env.telegram_chat_id, message);
-          }
-        });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500);
-      res.send(err);
-    });
+      .then((res) => {
+        return res.ok ? res.json() : res.text();
+      })
+      .then((json) => {
+        if (json.centers) {
+          json.centers.forEach((centre) => {
+            if (centre.sessions) {
+              centre.sessions.forEach((session) => {
+                if(session.available_capacity && session.available_capacity > 0) {
+                  let message = `Vaccination available for age group ( ${session.min_age_limit}+ )
+                  \n on Date: ${session.date}
+                  \n Center Name: ${centre.name}
+                  \n PINCODE: ${centre.pincode}
+                  \n Vaccine: ${session.vaccine}
+                  \n Slots: ${session.slots}
+                  \n Dose1 Availability: ${session.available_capacity_dose1}
+                  \n Dose2 Availability: ${session.available_capacity_dose2}`;
+                  bot.sendMessage(process.env.telegram_chat_id, message);
+                  if(response) {
+                    response.send(json);
+                  }
+                }
+              });
+            }
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500);
+        res.send(err);
+      });
+  }
 };
+
+app.get("/", getVaccinationUpdates());
