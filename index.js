@@ -47,6 +47,9 @@ const getVaccinationUpdates = () => {
         return res.ok ? res.json() : res.text();
       })
       .then((json) => {
+        if(response) {
+          response.send(json);
+        }
         if (json.centers) {
           json.centers.forEach((centre) => {
             if (centre.sessions) {
@@ -61,9 +64,6 @@ const getVaccinationUpdates = () => {
                   \n Dose1 Availability: ${session.available_capacity_dose1}
                   \n Dose2 Availability: ${session.available_capacity_dose2}`;
                   bot.sendMessage(process.env.telegram_chat_id, message);
-                  if(response) {
-                    response.send(json);
-                  }
                 }
               });
             }
@@ -72,8 +72,8 @@ const getVaccinationUpdates = () => {
       })
       .catch((err) => {
         console.error(err);
-        res.status(500);
-        res.send(err);
+        response.status(500);
+        response.send(err);
       });
   }
 };
