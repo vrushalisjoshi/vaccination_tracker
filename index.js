@@ -32,7 +32,7 @@ cron.schedule("*/1 * * * *", () => {
 const getVaccinationUpdates = () => {
   return (request, response) => {
     fetchUrl = url + nextDate();
-    console.log(fetchUrl);
+    console.log(fetchUrl, arrData);
     fetch(fetchUrl, {
       method: "GET",
       mode: "cors",
