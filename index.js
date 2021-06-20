@@ -39,8 +39,7 @@ const getVaccinationUpdates = () => {
       headers: {
         "Content-Type": "application/json",
         "Accept-Language": "hi_IN",
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
       },
     })
       .then((res) => {
@@ -54,17 +53,12 @@ const getVaccinationUpdates = () => {
           json.centers.forEach((centre) => {
             if (centre.sessions) {
               centre.sessions.forEach((session) => {
-                if (!arrData[session.session_id])
-                  arrData[session.session_id] = 0;
-                if (
-                  session.available_capacity &&
-                  session.available_capacity > 0
-                ) {
-                  if (
-                    arrData[session.session_id] != session.available_capacity
-                  ) {
-                    arrData[session.session_id] = session.available_capacity;
-                    let message = `Vaccination available for age group ( ${session.min_age_limit}+ )
+                if (!arrData[session.session_id]) arrData[session.session_id] = 0;
+
+                if (session.available_capacity && session.available_capacity > 0 && arrData[session.session_id] != session.available_capacity) {
+                  arrData[session.session_id] = session.available_capacity;
+
+                  let message = `Vaccination available for age group ( ${session.min_age_limit}+ )
                                     \n on Date: ${session.date}
                                     \n Center Name: ${centre.name}
                                     \n PINCODE: ${centre.pincode}
@@ -72,8 +66,8 @@ const getVaccinationUpdates = () => {
                                     \n Slots: ${session.slots}
                                     \n Dose1 Availability: ${session.available_capacity_dose1}
                                     \n Dose2 Availability: ${session.available_capacity_dose2}`;
-                    bot.sendMessage(process.env.telegram_chat_id, message);
-                  }
+
+                  bot.sendMessage(process.env.telegram_chat_id, message);
                 }
               });
             }
