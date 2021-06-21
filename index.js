@@ -14,6 +14,7 @@ const bot = new TelegramBot(process.env.TOKEN, {
 });
 
 let arrData = [];
+let arrCenterData = [];
 
 console.log(nextDate());
 
@@ -32,7 +33,7 @@ cron.schedule("*/10 * * * * *", () => {
 const getVaccinationUpdates = () => {
   return (request, response) => {
     fetchUrl = url + nextDate();
-    console.log(fetchUrl, arrData);
+    console.log(fetchUrl, arrData, arrCenterData);
     fetch(fetchUrl, {
       method: "GET",
       mode: "cors",
@@ -53,10 +54,18 @@ const getVaccinationUpdates = () => {
           json.centers.forEach((centre) => {
             if (centre.sessions) {
               centre.sessions.forEach((session) => {
-                if (!arrData[session.session_id]) arrData[session.session_id] = 0;
+                if (!arrData[session.session_id]) {
+                  arrData[session.session_id] = 0;
+                  arrCenterData[session.session_id] = {};
+                }
 
                 if (session.available_capacity && session.available_capacity > 0 && arrData[session.session_id] != session.available_capacity) {
                   arrData[session.session_id] = session.available_capacity;
+                  arrCenterData[session.session_id] = {
+                    name: centre.name,
+                    pincode: centre.pincode,
+                    capacity: session.available_capacity
+                  };
 
                   let message = `Vaccination available for age group ( ${session.min_age_limit}+ )
                                     \n on Date: ${session.date}
