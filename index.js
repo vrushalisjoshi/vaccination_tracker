@@ -17,8 +17,8 @@ let arrData = [];
 let arrCenterData = [];
 let arrMessages = [];
 const MSG_LIMIT = 5;
-const MSG_CRON_SEC = 1;
-const FETCH_CRON_SEC = 60;
+const MSG_CRON_SEC = 2;
+const FETCH_CRON_SEC = 30;
 
 console.log(nextDate());
 
