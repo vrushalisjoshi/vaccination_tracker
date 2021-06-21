@@ -16,6 +16,9 @@ const bot = new TelegramBot(process.env.TOKEN, {
 let arrData = [];
 let arrCenterData = [];
 let arrMessages = [];
+const MSG_LIMIT = 5;
+const MSG_CRON_SEC = 1;
+const FETCH_CRON_SEC = 60;
 
 console.log(nextDate());
 
@@ -25,14 +28,14 @@ app.listen(PORT, () => {
   console.log(`server started on PORT ${PORT}`);
 });
 
-cron.schedule("*/60 * * * * *", () => {
-  console.log("running a task every 60 seconds!");
+cron.schedule("*/" + FETCH_CRON_SEC + " * * * * *", () => {
+  console.log("running a task every " + FETCH_CRON_SEC + " seconds!");
   console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   getVaccinationUpdates()();
 });
 
-cron.schedule("*/60 * * * * *", () => {
-  console.log("Sending 20 messages every 60 seconds!");
+cron.schedule("*/" + MSG_CRON_SEC + " * * * * *", () => {
+  console.log("Sending " + MSG_LIMIT  + " messages every " + MSG_CRON_SEC + " seconds!");
   console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   sendMessages();
 });
@@ -40,7 +43,7 @@ cron.schedule("*/60 * * * * *", () => {
 const sendMessages = () => {
   let msgCount = 0;
 
-  while (arrMessages.length && 20 > msgCount) {
+  while (arrMessages.length && MSG_LIMIT > msgCount) {
     let message = arrMessages.shift();
     bot.sendMessage(process.env.telegram_chat_id, message);
     console.log(message);
