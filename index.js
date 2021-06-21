@@ -15,6 +15,7 @@ const bot = new TelegramBot(process.env.TOKEN, {
 
 let arrData = [];
 let arrCenterData = [];
+let arrMessages = [];
 
 console.log(nextDate());
 
@@ -24,7 +25,7 @@ app.listen(PORT, () => {
   console.log(`server started on PORT ${PORT}`);
 });
 
-cron.schedule("*/10 * * * * *", () => {
+cron.schedule("*/5 * * * * *", () => {
   console.log("running a task every 05 seconds!");
   console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   getVaccinationUpdates()();
@@ -67,7 +68,6 @@ const getVaccinationUpdates = () => {
                                     \n Slots: ${session.slots}
                                     \n Dose1 Availability: ${session.available_capacity_dose1}
                                     \n Dose2 Availability: ${session.available_capacity_dose2}`;
-                  console.log(message);
 
                   arrData[session.session_id] = session.available_capacity;
                   arrCenterData[session.session_id] = {
@@ -75,12 +75,24 @@ const getVaccinationUpdates = () => {
                     pincode: centre.pincode,
                     capacity: session.available_capacity,
                   };
-
-                  bot.sendMessage(process.env.telegram_chat_id, message);
+                  arrMessages.push(message);
                 }
               });
             }
           });
+
+          let i = 0;
+
+          setInterval(() => {
+            let msgCount = 0;
+            while (arrMessages.length && 5 > msgCount && arrMessages[i]) {
+              bot.sendMessage(process.env.telegram_chat_id, arrMessages[i]);
+              console.log(arrMessages[i]);
+              arrMessages.splice(i, 1);
+              i++;
+              msgCount++;
+            }
+          }, 5000);
         }
       })
       .catch((err) => {
