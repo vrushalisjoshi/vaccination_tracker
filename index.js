@@ -25,11 +25,28 @@ app.listen(PORT, () => {
   console.log(`server started on PORT ${PORT}`);
 });
 
-cron.schedule("*/5 * * * * *", () => {
-  console.log("running a task every 05 seconds!");
+cron.schedule("*/60 * * * * *", () => {
+  console.log("running a task every 60 seconds!");
   console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   getVaccinationUpdates()();
 });
+
+cron.schedule("*/60 * * * * *", () => {
+  console.log("Sending 20 messages every 60 seconds!");
+  console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  sendMessages();
+});
+
+const sendMessages = () => {
+  let msgCount = 0;
+
+  while (arrMessages.length && 20 > msgCount) {
+    let message = arrMessages.shift();
+    bot.sendMessage(process.env.telegram_chat_id, message);
+    console.log(message);
+    msgCount++;
+  }
+};
 
 const getVaccinationUpdates = () => {
   return (request, response) => {
@@ -80,19 +97,6 @@ const getVaccinationUpdates = () => {
               });
             }
           });
-
-          let i = 0;
-
-          setInterval(() => {
-            let msgCount = 0;
-            while (arrMessages.length && 5 > msgCount && arrMessages[i]) {
-              bot.sendMessage(process.env.telegram_chat_id, arrMessages[i]);
-              console.log(arrMessages[i]);
-              arrMessages.splice(i, 1);
-              i++;
-              msgCount++;
-            }
-          }, 5000);
         }
       })
       .catch((err) => {
