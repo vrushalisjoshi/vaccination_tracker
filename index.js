@@ -31,7 +31,6 @@ cron.schedule("*/10 * * * * *", () => {
 });
 
 const getVaccinationUpdates = () => {
-  let message = "";
   return (request, response) => {
     fetchUrl = url + nextDate();
     fetch(fetchUrl, {
@@ -60,15 +59,15 @@ const getVaccinationUpdates = () => {
                 }
 
                 if (session.available_capacity && session.available_capacity > 0 && arrData[session.session_id] != session.available_capacity) {
-                  message += `\n Vaccination available for age group ( ${session.min_age_limit}+ )
+                  let message = `Vaccination available for age group ( ${session.min_age_limit}+ )
                                     \n on Date: ${session.date}
                                     \n Center Name: ${centre.name}
                                     \n PINCODE: ${centre.pincode}
                                     \n Vaccine: ${session.vaccine}
                                     \n Slots: ${session.slots}
                                     \n Dose1 Availability: ${session.available_capacity_dose1}
-                                    \n Dose2 Availability: ${session.available_capacity_dose2}
-                                    \n ============================== \n`;
+                                    \n Dose2 Availability: ${session.available_capacity_dose2}`;
+                  console.log(message);
 
                   arrData[session.session_id] = session.available_capacity;
                   arrCenterData[session.session_id] = {
@@ -76,14 +75,12 @@ const getVaccinationUpdates = () => {
                     pincode: centre.pincode,
                     capacity: session.available_capacity,
                   };
+
+                  bot.sendMessage(process.env.telegram_chat_id, message);
                 }
               });
             }
           });
-          if ("" != message) {
-            console.log(message);
-            bot.sendMessage(process.env.telegram_chat_id, message);
-          }
         }
       })
       .catch((err) => {
