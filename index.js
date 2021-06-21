@@ -31,9 +31,9 @@ cron.schedule("*/10 * * * * *", () => {
 });
 
 const getVaccinationUpdates = () => {
+  let message = "";
   return (request, response) => {
     fetchUrl = url + nextDate();
-    console.log(fetchUrl, arrData, arrCenterData);
     fetch(fetchUrl, {
       method: "GET",
       mode: "cors",
@@ -60,27 +60,30 @@ const getVaccinationUpdates = () => {
                 }
 
                 if (session.available_capacity && session.available_capacity > 0 && arrData[session.session_id] != session.available_capacity) {
-                  arrData[session.session_id] = session.available_capacity;
-                  arrCenterData[session.session_id] = {
-                    name: centre.name,
-                    pincode: centre.pincode,
-                    capacity: session.available_capacity
-                  };
-
-                  let message = `Vaccination available for age group ( ${session.min_age_limit}+ )
+                  message += `\n Vaccination available for age group ( ${session.min_age_limit}+ )
                                     \n on Date: ${session.date}
                                     \n Center Name: ${centre.name}
                                     \n PINCODE: ${centre.pincode}
                                     \n Vaccine: ${session.vaccine}
                                     \n Slots: ${session.slots}
                                     \n Dose1 Availability: ${session.available_capacity_dose1}
-                                    \n Dose2 Availability: ${session.available_capacity_dose2}`;
+                                    \n Dose2 Availability: ${session.available_capacity_dose2}
+                                    \n ============================== \n`;
 
-                  bot.sendMessage(process.env.telegram_chat_id, message);
+                  arrData[session.session_id] = session.available_capacity;
+                  arrCenterData[session.session_id] = {
+                    name: centre.name,
+                    pincode: centre.pincode,
+                    capacity: session.available_capacity,
+                  };
                 }
               });
             }
           });
+          if ("" != message) {
+            console.log(message);
+            bot.sendMessage(process.env.telegram_chat_id, message);
+          }
         }
       })
       .catch((err) => {
