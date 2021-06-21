@@ -16,8 +16,8 @@ const bot = new TelegramBot(process.env.TOKEN, {
 let arrData = [];
 let arrCenterData = [];
 let arrMessages = [];
-const MSG_LIMIT = 5;
-const MSG_CRON_SEC = 2;
+const MSG_LIMIT = 20;
+const MSG_CRON_SEC = 60;
 const FETCH_CRON_SEC = 30;
 
 console.log(nextDate());
@@ -35,7 +35,7 @@ cron.schedule("*/" + FETCH_CRON_SEC + " * * * * *", () => {
 });
 
 cron.schedule("*/" + MSG_CRON_SEC + " * * * * *", () => {
-  console.log("Sending " + MSG_LIMIT  + " messages every " + MSG_CRON_SEC + " seconds!");
+  console.log("Sending " + MSG_LIMIT + " messages every " + MSG_CRON_SEC + " seconds!");
   console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   sendMessages();
 });
@@ -45,9 +45,16 @@ const sendMessages = () => {
 
   while (arrMessages.length && MSG_LIMIT > msgCount) {
     let message = arrMessages.shift();
-    bot.sendMessage(process.env.telegram_chat_id, message);
-    console.log(message);
-    msgCount++;
+    bot
+      .sendMessage(process.env.telegram_chat_id, message)
+      .then(() => {
+        console.log(message);
+        msgCount++;
+      })
+      .catch((err) => {
+        console.log("message not sent, added again");
+        arrMessages.unshift(message);
+      });
   }
 };
 
