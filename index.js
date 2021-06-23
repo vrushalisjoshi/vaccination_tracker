@@ -1,6 +1,6 @@
 const express = require("express");
 const fetch = require("node-fetch");
-const TelegramBot = require("node-telegram-bot-api");
+const Telegraf = require("telegraf").Telegraf;
 var cron = require("node-cron");
 const nextDate = require("./utils/GetNextDate");
 require("dotenv").config({ path: __dirname + "/.env" });
@@ -9,16 +9,18 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-const bot = new TelegramBot(process.env.TOKEN, {
-  polling: true,
-});
+const bot = new Telegraf(process.env.TOKEN);
 
 let arrData = [];
-let arrCenterData = [];
 let arrMessages = [];
-const MSG_LIMIT = 20;
-const MSG_CRON_SEC = 60;
+const MSG_CRON_SEC = 1;
 const FETCH_CRON_SEC = 30;
+
+let objHeaders = {
+  "Content-Type": "application/json",
+  "Accept-Language": "hi_IN",
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
+};
 
 console.log(nextDate());
 
@@ -35,7 +37,7 @@ cron.schedule("*/" + FETCH_CRON_SEC + " * * * * *", () => {
 });
 
 cron.schedule("*/" + MSG_CRON_SEC + " * * * * *", () => {
-  console.log("Sending " + MSG_LIMIT + " messages every " + MSG_CRON_SEC + " seconds!");
+  console.log("Sending messages every " + MSG_CRON_SEC + " seconds!");
   console.log(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   sendMessages();
 });
@@ -43,16 +45,15 @@ cron.schedule("*/" + MSG_CRON_SEC + " * * * * *", () => {
 const sendMessages = () => {
   let msgCount = 0;
 
-  while (arrMessages.length && MSG_LIMIT > msgCount) {
+  while (arrMessages.length) {
     let message = arrMessages.shift();
-    bot
-      .sendMessage(process.env.telegram_chat_id, message)
+    bot.telegram
+      .sendMessage(process.env.AURANGABAD_CHAT_ID, message)
       .then(() => {
-        console.log(message);
+        console.log(arrMessages.length + " : messages to be sent!");
         msgCount++;
       })
       .catch((err) => {
-        console.log("message not sent, added again");
         arrMessages.unshift(message);
       });
   }
@@ -64,11 +65,7 @@ const getVaccinationUpdates = () => {
     fetch(fetchUrl, {
       method: "GET",
       mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept-Language": "hi_IN",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
-      },
+      headers: objHeaders,
     })
       .then((res) => {
         return res.ok ? res.json() : res.text();
@@ -83,7 +80,6 @@ const getVaccinationUpdates = () => {
               centre.sessions.forEach((session) => {
                 if (!arrData[session.session_id]) {
                   arrData[session.session_id] = 0;
-                  arrCenterData[session.session_id] = {};
                 }
 
                 if (session.available_capacity && session.available_capacity > 0 && arrData[session.session_id] != session.available_capacity) {
@@ -92,16 +88,12 @@ const getVaccinationUpdates = () => {
                                     \n Center Name: ${centre.name}
                                     \n PINCODE: ${centre.pincode}
                                     \n Vaccine: ${session.vaccine}
+                                    \n Fee Type: ${centre.fee_type}
                                     \n Slots: ${session.slots}
                                     \n Dose1 Availability: ${session.available_capacity_dose1}
                                     \n Dose2 Availability: ${session.available_capacity_dose2}`;
 
                   arrData[session.session_id] = session.available_capacity;
-                  arrCenterData[session.session_id] = {
-                    name: centre.name,
-                    pincode: centre.pincode,
-                    capacity: session.available_capacity,
-                  };
                   arrMessages.push(message);
                 }
               });
