@@ -53,8 +53,7 @@ const sendMessages = (bot, botName, district_id) => {
 };
 
 const getVaccinationUpdates = () => {
-  console.log(arrDistricts);
-  if (arrDistricts.length) {
+  if (arrDistricts && arrDistricts.length) {
     arrDistricts.map((objDistrict) => {
       let botConst = eval(`process.env.${objDistrict.district_name.toUpperCase()}`);
       let botName = process.env.ABD_ID == objDistrict.district_id ? process.env.AURANGABAD_CHAT_ID : `@${objDistrict.district_name.toLowerCase().trim()}_${objDistrict.district_id}`;
@@ -120,6 +119,8 @@ const getDistricts = () => {
     })
     .then((districts) => {
       arrDistricts = districts;
+      console.log(arrDistricts);
+
       getVaccinationUpdates();
     })
     .catch((err) => {
