@@ -1,5 +1,5 @@
 {
-  "name": "user-services",
+  "name": "vacination-tracker",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
