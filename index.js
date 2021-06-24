@@ -1,7 +1,7 @@
 const express = require("express");
 const fetch = require("node-fetch");
 const Telegraf = require("telegraf").Telegraf;
-var cron = require("node-cron");
+const cron = require("node-cron");
 const nextDate = require("./utils/GetNextDate");
 require("dotenv").config({ path: __dirname + "/.env" });
 
@@ -13,6 +13,7 @@ const bot = new Telegraf(process.env.TOKEN);
 
 let arrData = [];
 let arrMessages = [];
+
 const MSG_CRON_SEC = 1;
 const FETCH_CRON_SEC = 30;
 
@@ -43,7 +44,6 @@ cron.schedule("*/" + MSG_CRON_SEC + " * * * * *", () => {
 });
 
 const sendMessages = () => {
-  let msgCount = 0;
 
   while (arrMessages.length) {
     let message = arrMessages.shift();
@@ -51,7 +51,6 @@ const sendMessages = () => {
       .sendMessage(process.env.AURANGABAD_CHAT_ID, message)
       .then(() => {
         console.log(arrMessages.length + " : messages to be sent!");
-        msgCount++;
       })
       .catch((err) => {
         arrMessages.unshift(message);
