@@ -53,6 +53,7 @@ const sendMessages = (bot, botName, district_id) => {
 };
 
 const getVaccinationUpdates = () => {
+  console.log(arrDistricts);
   if (arrDistricts.length) {
     arrDistricts.map((objDistrict) => {
       let botConst = eval(`process.env.${objDistrict.district_name.toUpperCase()}`);
