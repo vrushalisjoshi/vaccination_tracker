@@ -115,6 +115,8 @@ const getDistricts = () => {
       return res.ok ? res.json() : res.text();
     })
     .then((json) => {
+      console.log(json);
+
       return json.districts;
     })
     .then((districts) => {
