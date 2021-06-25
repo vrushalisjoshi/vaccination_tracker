@@ -219,21 +219,13 @@ const getVaccinationUpdates = () => {
                   }
 
                   if (session.available_capacity && session.available_capacity > 0 && arrData[session.session_id] != session.available_capacity) {
-                    let message = ` Age Group: ${session.min_age_limit}+
-                                    \n Date: ${session.date}
-                                    \n Center Name: ${centre.name}
-                                    \n PINCODE: ${centre.pincode}
-                                    \n Vaccine: ${session.vaccine}
-                                    \n Slots: ${session.slots}
-                                    \n Dose1 Availability: ${session.available_capacity_dose1}
-                                    \n Dose2 Availability: ${session.available_capacity_dose2}
-                                    \n Fee Type: ${centre.fee_type}`;
+                    let message = ` Age Group: ${session.min_age_limit}+ \n Date: ${session.date} \n Center: ${centre.name} \n PINCODE: ${centre.pincode} \n Vaccine: ${session.vaccine} \n Dose1 Availability: ${session.available_capacity_dose1} \n Dose2 Availability: ${session.available_capacity_dose2} \n Fee Type: ${centre.fee_type}`;
                     if (centre.vaccine_fees) {
                       let objVaccine = centre.vaccine_fees.find((objVaccine) => {
                         if (objVaccine.vaccine == session.vaccine) return objVaccine;
                       });
                       if (objVaccine && objVaccine.fee) {
-                        message = message + `\n Fee: ${objVaccine.fee}`;
+                        message = message + `\n Fee: ₹ ${objVaccine.fee}`;
                       }
                     }
 
