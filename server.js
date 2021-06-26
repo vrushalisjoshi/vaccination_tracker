@@ -219,9 +219,9 @@ const getVaccinationUpdates = () => {
                   }
 
                   if (session.available_capacity && session.available_capacity > 0 && arrData[session.session_id] != session.available_capacity) {
-                    let message = ` \n Vaccine: ${session.vaccine} \n Age Group: ${session.min_age_limit}+ 
-                                    \n Date: ${session.date} 
-                                    \n ${centre.district_name} \n PINCODE: ${centre.pincode} \n Center: ${centre.name} 
+                    let message = ` \n Vaccine: ${session.vaccine} \n Age Group: ${session.min_age_limit}+
+                                    \n Date: ${session.date}
+                                    \n ${centre.district_name} \n PINCODE: ${centre.pincode} \n Center: ${centre.name}
                                     \n Dose1 Availability: ${session.available_capacity_dose1} \n Dose2 Availability: ${session.available_capacity_dose2} \n Fee: `;
                     let feeMsg = `Free`;
                     if (centre.vaccine_fees) {
